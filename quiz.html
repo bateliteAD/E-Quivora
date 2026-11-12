@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masomo Broo | Science Trivia Quiz</title>
+<link rel="stylesheet" href="crosswords_2.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="sample.html"><span class="brand-mark">MB</span> Masomo <b>Broo</b></a>
+  <a class="back-link" href="sample.html">← Back to activities</a>
+</header>
+<main class="page">
+<section class="game-heading">
+  <div>
+    <p class="eyebrow">GRADE 7 · INTEGRATED SCIENCE</p>
+    <h1>Science Trivia Quiz</h1>
+    <p class="intro">Test your knowledge on ecosystems, matter, and energy[cite: 7].</p>
+  </div>
+  <div class="progress-card">
+    <div class="progress-line"><span id="progress-label">Score</span><strong id="progress-percent">0 / 3</strong></div>
+    <div class="progress-track"><div id="progress-fill" style="width: 0%;"></div></div>
+    <p id="status-message" aria-live="polite">Answer all questions below.</p>
+  </div>
+</section>
+
+<section class="game-layout">
+  <div class="board-panel" style="grid-column: span 2;">
+    <div class="panel-top">
+      <div><span class="mini-label">QUESTION 1 OF 3</span><h2 id="quiz-question">Which organism produces its own food using sunlight?</h2></div>
+      <span class="grid-tag">Quiz</span>
+    </div>
+    <div id="quiz-options" style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0;">
+      <button class="clue" data-correct="false"><span class="clue-num">A.</span><span class="clue-text">Consumer</span></button>
+      <button class="clue" data-correct="true"><span class="clue-num">B.</span><span class="clue-text">Producer (Plants)</span></button>
+      <button class="clue" data-correct="false"><span class="clue-num">C.</span><span class="clue-text">Decomposer</span></button>
+      <button class="clue" data-correct="false"><span class="clue-num">D.</span><span class="clue-text">Carnivore</span></button>
+    </div>
+    <div class="actions">
+      <button id="next-quiz" class="btn btn-primary" style="display: none;">Next Question →</button>
+    </div>
+  </div>
+</section>
+<footer><span>Learn a little. Solve a lot.</span><span>© Masomo Broo</span></footer>
+</main>
+<script>
+const questions = [
+  {
+    q: "Which organism produces its own food using sunlight?",
+    options: ["Consumer", "Producer (Plants)", "Decomposer", "Carnivore"],
+    correct: 1
+  },
+  {
+    q: "What is the primary gas absorbed by plants during photosynthesis?",
+    options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+    correct: 2
+  },
+  {
+    q: "Which state of matter has a definite volume but no fixed shape?",
+    options: ["Solid", "Liquid", "Gas", "Plasma"],
+    correct: 1
+  }
+];
+
+let currentQ = 0, score = 0;
+const qHeading = document.getElementById("quiz-question");
+const optionsHost = document.getElementById("quiz-options");
+const nextBtn = document.getElementById("next-quiz");
+const statusMsg = document.getElementById("status-message");
+
+function loadQuestion() {
+  const item = questions[currentQ];
+  document.querySelector(".mini-label").textContent = `QUESTION ${currentQ + 1} OF ${questions.length}`;
+  qHeading.textContent = item.q;
+  optionsHost.innerHTML = "";
+  item.options.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "clue";
+    btn.innerHTML = `<span class="clue-num">${String.fromCharCode(65 + idx)}.</span><span class="clue-text">${opt}</span>`;
+    btn.addEventListener("click", () => checkAnswer(idx, btn));
+    optionsHost.appendChild(btn);
+  });
+  nextBtn.style.display = "none";
+}
+
+function checkAnswer(selectedIdx, btnElement) {
+  const item = questions[currentQ];
+  const allBtns = optionsHost.querySelectorAll("button");
+  allBtns.forEach(b => b.style.pointerEvents = "none");
+
+  if(selectedIdx === item.correct) {
+    btnElement.style.borderColor = "var(--green)";
+    btnElement.style.background = "#1b2d23";
+    score++;
+    statusMsg.textContent = "Correct!";
+  } else {
+    btnElement.style.borderColor = "var(--red)";
+    btnElement.style.background = "#2d1b1b";
+    allBtns[item.correct].style.borderColor = "var(--green)";
+    statusMsg.textContent = "Incorrect.";
+  }
+
+  document.getElementById("progress-percent").textContent = `${score} / ${questions.length}`;
+  document.getElementById("progress-fill").style.width = `${((currentQ + 1) / questions.length) * 100}%`;
+
+  if(currentQ < questions.length - 1) {
+    nextBtn.style.display = "inline-block";
+  } else {
+    statusMsg.textContent = `🎉 Quiz Completed! Final Score: ${score}/${questions.length}`;
+  }
+}
+
+nextBtn.addEventListener("click", () => {
+  currentQ++;
+  loadQuestion();
+});
+
+loadQuestion();
+</script>
+</body>
+</html>

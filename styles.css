@@ -1,0 +1,7 @@
+body { font-family: 'Arial', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+.auth-box { background: #fff; padding: 40px; border-radius: 10px; shadow: 0 10px 25px rgba(0,0,0,0.1); width: 320px; text-align: center; }
+input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+button:hover { background: #218838; }
+.error { color: red; font-size: 14px; }
+a { color: #007bff; text-decoration: none; font-size: 14px; }

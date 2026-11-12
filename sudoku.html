@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masomo Broo | Number Logic Sudoku</title>
+<link rel="stylesheet" href="crosswords_2.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="sample.html"><span class="brand-mark">MB</span> Masomo <b>Broo</b></a>
+  <a class="back-link" href="sample.html">← Back to activities</a>
+</header>
+<main class="page">
+<section class="game-heading">
+  <div>
+    <p class="eyebrow">GRADE 8 · MATHEMATICS</p>
+    <h1>Number Logic 4×4 Sudoku</h1>
+    <p class="intro">Grade 8 Mathematics · Logic Puzzle. Fill each row, column, and 2×2 box with numbers 1 to 4[cite: 7].</p>
+  </div>
+  <div class="progress-card">
+    <div class="progress-line"><span id="progress-label">Cells correct</span><strong id="progress-percent">0%</strong></div>
+    <div class="progress-track"><div id="progress-fill" style="width: 0%;"></div></div>
+    <p id="status-message" aria-live="polite">Ready when you are.</p>
+  </div>
+</section>
+
+<section class="game-layout">
+  <div class="board-panel">
+    <div class="panel-top">
+      <div><span class="mini-label">SUDOKU GRID</span><h2>Number Matrix</h2></div>
+      <span class="grid-tag">4×4 Grid</span>
+    </div>
+    <div id="sudoku-grid" class="crossword-grid" style="grid-template-columns: repeat(4, minmax(45px, 65px));" role="group" aria-label="Sudoku puzzle grid"></div>
+    <div class="grid-help">Type numbers 1-4 per square <span class="dot">•</span> Each number must be unique per row, column & 2×2 box</div>
+    <div class="actions">
+      <button id="check-sudoku" class="btn btn-primary">Check solution</button>
+      <button id="reset-sudoku" class="btn btn-quiet">Reset puzzle</button>
+    </div>
+  </div>
+  <aside class="clues-panel">
+    <div class="clues-header"><span class="mini-label">INSTRUCTIONS</span><h2>How to Play</h2></div>
+    <div class="clue-columns" style="grid-template-columns: 1fr;">
+      <div class="clue" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+        <strong>Rule 1: Rows</strong>
+        <span>Every row must contain digits 1 through 4 without repeating.</span>
+      </div>
+      <div class="clue" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+        <strong>Rule 2: Columns</strong>
+        <span>Every column must contain digits 1 through 4 without repeating.</span>
+      </div>
+      <div class="clue" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+        <strong>Rule 3: Subgrids</strong>
+        <span>Each 2×2 box must contain digits 1 through 4.</span>
+      </div>
+    </div>
+  </aside>
+</section>
+<footer><span>Learn a little. Solve a lot.</span><span>© Masomo Broo</span></footer>
+</main>
+<script>
+const solution = [
+  [2, 1, 3, 4],
+  [3, 4, 1, 2],
+  [1, 3, 4, 2],
+  [4, 2, 3, 1]
+];
+const initial = [
+  [2, 0, 0, 4],
+  [0, 4, 1, 0],
+  [1, 0, 4, 0],
+  [0, 2, 3, 1]
+];
+const grid = document.getElementById("sudoku-grid");
+const inputs = [];
+
+function renderSudoku() {
+  grid.innerHTML = "";
+  for(let r=0; r<4; r++) {
+    inputs[r] = [];
+    for(let c=0; c<4; c++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      const input = document.createElement("input");
+      input.maxLength = 1;
+      input.autocomplete = "off";
+      if(initial[r][c] !== 0) {
+        input.value = initial[r][c];
+        input.readOnly = true;
+        input.style.background = "#2b2f35";
+        input.style.color = "var(--amber)";
+      } else {
+        input.addEventListener("input", (e) => {
+          e.target.value = e.target.value.replace(/[^1-4]/g, "");
+          updateSudokuProgress();
+        });
+      }
+      cell.appendChild(input);
+      grid.appendChild(cell);
+      inputs[r][c] = input;
+    }
+  }
+}
+
+function updateSudokuProgress() {
+  let correct = 0, total = 0;
+  for(let r=0; r<4; r++) {
+    for(let c=0; c<4; c++) {
+      if(initial[r][c] === 0) {
+        total++;
+        if(inputs[r][c].value == solution[r][c]) correct++;
+      }
+    }
+  }
+  const pct = Math.round((correct / total) * 100);
+  document.getElementById("progress-percent").textContent = pct + "%";
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("status-message").textContent = correct === total ? "🎉 Puzzle Solved Successfully!" : `${correct} of ${total} empty cells correct.`;
+}
+
+document.getElementById("check-sudoku").addEventListener("click", () => {
+  for(let r=0; r<4; r++) {
+    for(let c=0; c<4; c++) {
+      if(initial[r][c] === 0) {
+        const val = inputs[r][c].value;
+        const parent = inputs[r][c].parentElement;
+        parent.classList.remove("correct", "incorrect");
+        if(val) {
+          parent.classList.add(val == solution[r][c] ? "correct" : "incorrect");
+        }
+      }
+    }
+  }
+  updateSudokuProgress();
+});
+
+document.getElementById("reset-sudoku").addEventListener("click", () => {
+  renderSudoku();
+  document.getElementById("progress-percent").textContent = "0%";
+  document.getElementById("progress-fill").style.width = "0%";
+  document.getElementById("status-message").textContent = "Puzzle reset.";
+});
+
+renderSudoku();
+</script>
+</body>
+</html>

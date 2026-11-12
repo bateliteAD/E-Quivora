@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masomo Broo | Animal Kingdom Word Search</title>
+<link rel="stylesheet" href="crosswords_2.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="sample.html"><span class="brand-mark">MB</span> Masomo <b>Broo</b></a>
+  <a class="back-link" href="sample.html">← Back to activities</a>
+</header>
+<main class="page">
+<section class="game-heading">
+  <div>
+    <p class="eyebrow">GRADE 3 · INTEGRATED SCIENCE</p>
+    <h1>Animal Kingdom Word Search</h1>
+    <p class="intro">Find hidden science vocabulary words in the letter matrix[cite: 7].</p>
+  </div>
+  <div class="progress-card">
+    <div class="progress-line"><span id="progress-label">Status</span><strong id="progress-percent">Active</strong></div>
+    <div class="progress-track"><div id="progress-fill" style="width: 50%;"></div></div>
+    <p id="status-message" aria-live="polite">Click letters to select words.</p>
+  </div>
+</section>
+
+<section class="game-layout">
+  <div class="board-panel">
+    <div class="panel-top">
+      <div><span class="mini-label">LETTER MATRIX</span><h2>Find Words</h2></div>
+      <span class="grid-tag">6×6 Grid</span>
+    </div>
+    <div id="wordsearch-grid" class="crossword-grid" style="grid-template-columns: repeat(6, minmax(35px, 50px));" role="group" aria-label="Word search grid"></div>
+    <div class="actions" style="margin-top: 15px;">
+      <button id="reset-ws" class="btn btn-quiet">Reset Matrix</button>
+    </div>
+  </div>
+  <aside class="clues-panel">
+    <div class="clues-header"><span class="mini-label">WORD BANK</span><h2>Words to Find</h2></div>
+    <div class="clue-columns" style="grid-template-columns: 1fr;">
+      <div class="clue"><span class="clue-num">1.</span><span class="clue-text">LION</span></div>
+      <div class="clue"><span class="clue-num">2.</span><span class="clue-text">ZEBRA</span></div>
+      <div class="clue"><span class="clue-num">3.</span><span class="clue-text">EAGLE</span></div>
+      <div class="clue"><span class="clue-num">4.</span><span class="clue-text">FISH</span></div>
+    </div>
+  </aside>
+</section>
+<footer><span>Learn a little. Solve a lot.</span><span>© Masomo Broo</span></footer>
+</main>
+<script>
+const matrix = [
+  ['L', 'I', 'O', 'N', 'X', 'Z'],
+  ['A', 'B', 'C', 'D', 'E', 'E'],
+  ['F', 'I', 'S', 'H', 'G', 'B'],
+  ['H', 'I', 'J', 'K', 'L', 'R'],
+  ['E', 'A', 'G', 'L', 'E', 'A'],
+  ['M', 'N', 'O', 'P', 'Q', 'Z']
+];
+
+const grid = document.getElementById("wordsearch-grid");
+
+function renderWordSearch() {
+  grid.innerHTML = "";
+  for(let r=0; r<6; r++) {
+    for(let c=0; c<6; c++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      const input = document.createElement("input");
+      input.value = matrix[r][c];
+      input.readOnly = true;
+      input.style.cursor = "pointer";
+      input.addEventListener("click", () => {
+        cell.style.background = cell.style.background === "rgb(201, 246, 223)" ? "#f4f1e9" : "#c9f6df";
+      });
+      cell.appendChild(input);
+      grid.appendChild(cell);
+    }
+  }
+}
+
+document.getElementById("reset-ws").addEventListener("click", renderWordSearch);
+renderWordSearch();
+</script>
+</body>
+</html>

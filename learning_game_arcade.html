@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LearningGame | Learning Arcade</title>
+<style>
+:root{--bg:#101216;--panel:#191c22;--panel2:#20242c;--text:#f4f2ed;--muted:#a4a8b2;--accent:#f0a83c;--border:rgba(255,255,255,.12);--good:#65d6a1;--bad:#ff8585}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif}.page{width:min(1080px,calc(100% - 32px));margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:24px 0;border-bottom:1px solid var(--border)}header small,.eyebrow{color:var(--accent);font-size:.72rem;font-weight:800;letter-spacing:.13em}.brand{color:var(--text);font-weight:900;letter-spacing:.08em;text-decoration:none}.brand span,h1 span{color:var(--accent)}
+.hero{padding:54px 0 32px}.hero h1{font-size:clamp(2.5rem,7vw,4.5rem);letter-spacing:-.06em;line-height:1.02;margin:12px 0}.hero>p:last-child,.hint,.lesson p{color:var(--muted);line-height:1.7}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:clamp(18px,4vw,30px)}.heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.heading h2,.lesson h2{margin:7px 0 0;font-size:1.45rem}
+.filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}label{display:grid;gap:9px;color:var(--muted);font-size:.88rem;font-weight:700}select,input{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:13px;font:inherit}
+button{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:9px;padding:10px 13px;cursor:pointer;font:inherit}button:hover{border-color:var(--accent)}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.results{padding:42px 0}.heading>span{font-size:.85rem;color:var(--muted);white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.activity-card{background:linear-gradient(145deg,#1d2027,#15171c);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column;min-height:245px;transition:transform 0.25s ease, border-color 0.25s ease}.activity-card:hover{border-color:rgba(240,168,60,0.4);transform:translateY(-2px)}.card-top{display:flex;justify-content:space-between;align-items:center}.game-icon{width:42px;height:42px;display:grid;place-items:center;background:#f0a83c1c;border:1px solid #f0a83c55;border-radius:12px;font-size:1.4rem}.pill{border:1px solid var(--border);border-radius:99px;padding:6px 9px;color:var(--muted);font-size:.7rem}.activity-card h3{font-size:1.1rem;margin:18px 0 8px}.activity-card p{color:var(--muted);font-size:.88rem;line-height:1.55}.meta{color:var(--muted);font-size:.76rem;margin-top:auto;padding:8px 0 15px}.play-link{display:block;text-align:center;background:var(--accent);color:#21170a;border-radius:9px;padding:11px;font-weight:900;text-decoration:none;border:0;cursor:pointer;transition:transform 0.2s ease, filter 0.2s ease}.play-link:hover{filter:brightness(1.1);transform:translateY(-1px)}.empty{color:var(--muted);border:1px dashed var(--border);border-radius:14px;padding:28px;text-align:center}.lesson{margin-bottom:42px}footer{color:var(--muted);border-top:1px solid var(--border);padding:24px 0 32px;font-size:.72rem;letter-spacing:.1em}
+#game-area[hidden]{display:none}.game-panel{margin:0 0 42px}.game-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.game-question{font-size:1.2rem;line-height:1.55;margin:22px 0}.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.answer{background:var(--panel2);text-align:left;padding:14px}.answer.correct{border-color:var(--good);color:var(--good)}.answer.wrong{border-color:var(--bad);color:var(--bad)}.feedback{min-height:28px;color:var(--muted);line-height:1.6;margin:16px 0}.game-controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.primary{background:var(--accent);color:#21170a;border-color:var(--accent);font-weight:800}.score{color:var(--accent);font-weight:800}.progress{height:7px;background:var(--panel2);border-radius:9px;overflow:hidden;margin-top:14px}.progress div{height:100%;background:var(--accent);width:0;transition:width .2s}.word-input{max-width:520px}.small-note{color:var(--muted);font-size:.85rem}
+
+/* Sleek Modern Audio HUD Header Controls */
+.audio-controls-header{display:flex;align-items:center;gap:10px;background:var(--panel);padding:4px 6px;border-radius:12px;border:1px solid var(--border)}
+.music-controls{display:flex;align-items:center;gap:6px;position:relative}
+.music-toggle,.sound-toggle{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid var(--border);background:var(--panel2);color:var(--text);font-family:inherit;font-size:.78rem;font-weight:700;border-radius:9px;cursor:pointer;white-space:nowrap;transition:all 0.2s ease}
+.music-toggle:hover,.sound-toggle:hover{background:rgba(240,168,60,0.15);border-color:var(--accent);color:var(--accent)}
+.hud-icon{font-size:.9rem}
+.volume-slider-wrapper{display:flex;align-items:center;gap:6px;max-width:0;opacity:0;overflow:hidden;transition:max-width 0.35s ease,opacity 0.25s ease,padding 0.25s ease}
+.music-controls:hover .volume-slider-wrapper,.volume-slider-wrapper:focus-within{max-width:130px;opacity:1;padding:0 4px}
+.music-volume-label{font-size:.68rem;color:var(--accent);font-weight:900;letter-spacing:.05em}
+.music-volume{width:70px;accent-color:var(--accent);cursor:pointer;height:4px}
+
+@media(max-width:760px){.filters,.cards,.answers{grid-template-columns:1fr}.hero{padding-top:40px}.heading{align-items:flex-start}.activity-card{min-height:215px}header{flex-direction:column;align-items:flex-start}.audio-controls-header{width:100%;justify-content:space-between}}
+@media(min-width:761px) and (max-width:950px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.home{background-color:#f3ca88; color:#101216; font-weight: bolder; transition:0.5s;padding-left:40px;padding-right:40px;border:none;padding-top:7px;padding-bottom:7px;border-radius:5px 5px 5px;margin-left:20px}
+.home:hover{transform:translateY(-2px);transition:0.5s;background-color:#a37a3d}
+.home a{text-decoration:none;color:#21170a}
+</style>
+</head>
+<body><main class="page">
+<header>
+  <a href="index.html" class="brand" id="home-link">learning<span>Game</span></a>
+  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+    <!-- Sleek Audio HUD Header Controls -->
+    <div class="audio-controls-header">
+      <div class="music-controls" title="Background Music">
+        <button class="music-toggle" id="musicToggle" type="button" aria-pressed="true">
+          <span class="hud-icon">♫</span>
+          <span class="hud-text">Music On</span>
+        </button>
+        <div class="volume-slider-wrapper">
+          <span class="music-volume-label">VOL</span>
+          <input id="musicVolume" class="music-volume" type="range" min="0" max="100" value="30" aria-label="Background music volume">
+        </div>
+      </div>
+      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" aria-label="Mute sound" title="Sound Effects">
+        <span class="hud-icon">🔊</span>
+        <span class="hud-text">SFX On</span>
+      </button>
+    </div>
+    <a  href="index.html"><button class="home" type="button">HOME</button></a>
+  </div>
+</header>
+<section class="hero"><p class="eyebrow">FIND YOUR NEXT CHALLENGE</p><h1>Choose. Learn. <span>Play.</span></h1></section>
+<section class="panel" id="filters-panel"><div class="heading"><div><p class="eyebrow">01 / FILTER</p><h2>Build your session</h2></div><button id="reset-button" type="button">Reset filters</button></div>
+<div class="filters">
+<label>Grade<select id="grade-filter"><option value="all">All grades</option><option>Pre-School</option><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6</option><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option></select></label>
+<label>Subject<select id="subject-filter"><option value="all">All subjects</option><option>English</option><option>Kiswahili</option><option>Mathematics</option><option>Integrated Science</option><option>Pre-Technical</option><option>Social Studies</option><option>ICT</option></select></label>
+<label>Game type<select id="type-filter"><option value="all">All game types</option><option>Quiz</option><option>Crossword</option><option>Simulation</option><option>Word Scramble</option><option>Flashcards</option><option>True or False</option><option>Math Sprint</option><option>Logic Puzzle</option><option>Science Lab</option><option>Grammar Builder</option><option>Map Challenge</option><option>Shooter</option><option>Jigsaw Puzzle</option></select></label>
+</div><p class="hint">Pick “All” to see every activity. Each game has feedback, scoring and a replay option.</p></section>
+<section class="results" id="results-section"><div class="heading"><div><p>Choose a grade, subject and game type. Open any activity to learn, practise and check your answers. Works offline in one file.</p><p class="eyebrow">02 / ACTIVITIES</p><h2>Available challenges</h2></div><span id="result-count">0 activities</span></div><div id="activity-list" class="cards" aria-live="polite"></div><p id="empty-state" class="empty" hidden>No activities match those filters. Try another selection.</p></section>
+<section id="game-area" hidden class="panel game-panel" aria-live="polite"></section>
+<footer>LEARNINGGAME · SINGLE-FILE OFFLINE LEARNING ARCADE</footer></main>
+
+<!-- Audio Assets -->
+<audio id="bgMusic" src="audio/Samplebackground.mp3" preload="auto" loop></audio>
+<audio id="sfxClick" src="audio/keyboard.mp3" preload="auto"></audio>
+<audio id="sfxHover" src="audio/keyboard.mp3" preload="auto"></audio>
+<audio id="sfxPlay" src="audio/keyboard.mp3" preload="auto"></audio>
+<audio id="sfxSwitch" src="audio/keyboard.mp3" preload="auto"></audio>
+
+<script>
+const bank=[
+{id:1,title:"Word Detectives",grade:"Grade 4",subject:"English",type:"Crossword",level:"Beginner",icon:"📝",description:"Solve vocabulary clues and type the matching word.",mode:"input",questions:[["A word that means the opposite of hot.","cold"],["A person who teaches learners.","teacher"],["A place where you borrow books.","library"],["A word for a young dog.","puppy"],["The plural of child.","children"]]},
+{id:2,title:"Kiswahili Msamiati",grade:"Grade 5",subject:"Kiswahili",type:"Word Scramble",level:"Beginner",icon:"🔤",description:"Practise common Kiswahili words and their meanings.",mode:"scramble",questions:[["Rearrange these letters to make a word meaning a book: UBATIK","kitabu"],["Kiswahili word for water.","maji"],["Kiswahili word for school.","shule"],["Kiswahili word for friend.","rafiki"],["Kiswahili word for book.","kitabu"]]},
+{id:3,title:"Number Logic 4×4",grade:"Grade 8",subject:"Mathematics",type:"Logic Puzzle",level:"Beginner",icon:"▩",description:"Solve number patterns and logical number challenges.",mode:"quiz",questions:[["What number comes next: 2, 4, 6, 8, __?",["9","10","12","14"],"10","The sequence increases by 2."],["Which number is prime?",["9","15","17","21"],"17","17 has exactly two positive factors: 1 and 17."],["What is 3²?",["6","9","12","27"],"9","3 squared is 3 × 3."],["What is the missing number: 5, 10, __, 20?",["12","15","16","18"],"15","The sequence increases by 5."]]},
+{id:4,title:"Science Explorer",grade:"Grade 7",subject:"Integrated Science",type:"Quiz",level:"Beginner",icon:"⚗️",description:"Review foundational science ideas with instant explanations.",mode:"quiz",questions:[["Which organ pumps blood around the body?",["Lungs","Heart","Kidney","Stomach"],"Heart","The heart pumps blood through blood vessels."],["Which state of matter has a fixed shape?",["Liquid","Gas","Solid","Vapour"],"Solid","Solids have a definite shape and volume."],["Which is a source of light?",["Moon","Mirror","Sun","Book"],"Sun","The Sun produces its own light."],["Plants make food mainly through which process?",["Digestion","Photosynthesis","Evaporation","Condensation"],"Photosynthesis","Photosynthesis uses light energy to make food."]]},
+{id:5,title:"Communication Skills",grade:"Grade 8",subject:"Pre-Technical",type:"Quiz",level:"Intermediate",icon:"💬",description:"Test communication, listening and feedback concepts.",mode:"quiz",questions:[["Which is an example of non-verbal communication?",["Email","Facial expression","Telephone call","Speech"],"Facial expression","Facial expressions communicate without words."],["What should a good listener do?",["Interrupt often","Ignore the speaker","Pay attention","Change the topic"],"Pay attention","Active listening involves focusing on the speaker."],["Which tool is used to send a written digital message?",["Hammer","Email","Ruler","Compass"],"Email","Email is an electronic messaging method."]]},
+{id:6,title:"Visual Programming",grade:"Grade 8",subject:"Pre-Technical",type:"Logic Puzzle",level:"Intermediate",icon:"💻",description:"Practise algorithms, sequence and computational thinking.",mode:"quiz",questions:[["What is an algorithm?",["A computer screen","A step-by-step set of instructions","A type of cable","A battery"],"A step-by-step set of instructions","Algorithms describe steps for solving a problem."],["In a sequence, what usually happens first?",["The last instruction","A random step","The first instruction","The result"],"The first instruction","Sequence means instructions follow a specified order."],["What does a loop do in programming?",["Repeats instructions","Deletes the screen","Turns off the keyboard","Prints paper"],"Repeats instructions","Loops repeat a set of instructions."],["Which is an input device?",["Monitor","Speaker","Keyboard","Projector"],"Keyboard","A keyboard sends data into a computer."]]},
+{id:7,title:"Ceramics and Composites",grade:"Grade 8",subject:"Pre-Technical",type:"True or False",level:"Intermediate",icon:"🧱",description:"Check your understanding of materials and their properties.",mode:"quiz",questions:[["Ceramics are often hard and brittle.",["True","False"],"True","Many ceramics are hard but can fracture when struck."],["A composite combines two or more different materials.",["True","False"],"True","Composites combine materials to achieve useful properties."],["All metals are electrical insulators.",["True","False"],"False","Metals generally conduct electricity."],["Clay can be shaped before firing.",["True","False"],"True","Clay is shaped while workable, then may be fired."]]},
+{id:8,title:"Math Sprint",grade:"Grade 6",subject:"Mathematics",type:"Math Sprint",level:"Beginner",icon:"➗",description:"Practise arithmetic, fractions and percentages.",mode:"quiz",questions:[["24 ÷ 6 = ?",["3","4","6","8"],"4","24 divided by 6 equals 4."],["What is 25% of 80?",["10","15","20","25"],"20","25% is one quarter; 80 ÷ 4 = 20."],["3/4 + 1/4 = ?",["1/2","1","1 1/2","2"],"1","The denominators match, so add 3 + 1 = 4 quarters."],["-3 + 8 = ?",["-11","-5","5","11"],"5","Starting at -3 and moving 8 steps right gives 5."]]},
+{id:9,title:"English Grammar Builder",grade:"Grade 7",subject:"English",type:"Grammar Builder",level:"Intermediate",icon:"✍️",description:"Identify parts of speech and choose grammatically correct sentences.",mode:"quiz",questions:[["Which word is the adjective in 'the bright sun'?",["the","bright","sun","is"],"bright","An adjective describes a noun."],["Choose the correct sentence.",["She go to school.","She goes to school.","She going school.","She gone school."],"She goes to school.","Use 'goes' with she in the simple present tense."],["What is the past tense of 'write'?",["writed","wrote","writing","writes"],"wrote","The simple past of write is wrote."]]},
+{id:10,title:"Kenya Map Challenge",grade:"Grade 6",subject:"Social Studies",type:"Map Challenge",level:"Beginner",icon:"🗺️",description:"Test your knowledge of Kenya and world geography.",mode:"quiz",questions:[["What is the capital city of Kenya?",["Mombasa","Nairobi","Kisumu","Nakuru"],"Nairobi","Nairobi is Kenya's capital city."],["Which ocean borders Kenya to the southeast?",["Atlantic","Pacific","Indian","Arctic"],"Indian","Kenya has a coastline on the Indian Ocean."],["Which is the largest continent by area?",["Africa","Asia","Europe","Australia"],"Asia","Asia is the largest continent by area."],["Which Kenyan lake is famous for flamingos?",["Lake Victoria","Lake Nakuru","Lake Jipe","Lake Chala"],"Lake Nakuru","Lake Nakuru is well known for its birdlife, including flamingos."]]},
+{id:11,title:"Science Lab: Electricity",grade:"Grade 8",subject:"Integrated Science",type:"Science Lab",level:"Intermediate",icon:"🔬",description:"Predict what happens in simple electric circuits.",mode:"quiz",questions:[["What is needed for current to flow in a simple circuit?",["An open circuit","A complete circuit","Only a switch","A plastic wire"],"A complete circuit","A closed, complete path allows current to flow."],["Which material is a good electrical conductor?",["Copper","Rubber","Dry wood","Plastic"],"Copper","Copper is widely used for conducting wires."],["What happens when a switch opens a simple circuit?",["The bulb gets brighter","Current stops flowing","The battery grows","Nothing ever changes"],"Current stops flowing","An open switch breaks the conducting path."]]},
+{id:12,title:"Flashcard Science",grade:"Grade 5",subject:"Integrated Science",type:"Flashcards",level:"Beginner",icon:"🃏",description:"Review key science terms one card at a time.",mode:"flash",questions:[["Evaporation","The change from liquid to gas at the surface."],["Habitat","The natural place where an organism lives."],["Force","A push or pull that can change motion or shape."],["Condensation","The change from gas to liquid."],["Pollination","Transfer of pollen from anther to stigma."]]},
+{id:13,title:"Kiswahili Sarufi",grade:"Grade 7",subject:"Kiswahili",type:"Quiz",level:"Intermediate",icon:"🇰🇪",description:"Practise Kiswahili vocabulary and grammar.",mode:"quiz",questions:[["Wingi wa 'kitabu' ni upi?",["vitabu","makitabu","kitabus","mitabu"],"vitabu","Nomino za ngeli ya ki-/vi- hubadilika kutoka ki- hadi vi-."],["Kinyume cha 'refu' ni nini?",["kubwa","fupi","nene","pana"],"fupi","Kinyume cha refu ni fupi."],["Neno 'haraka' lina maana gani?",["Polepole","Upesi","Kimya","Mbali"],"Upesi","Haraka maana yake ni upesi."],["Jaza nafasi: Mimi ___ mwanafunzi.",["ni","wa","la","za"],"ni","Sentensi sahihi ni 'Mimi ni mwanafunzi.'"]]},
+{id:14,title:"Number Sequences",grade:"Grade 5",subject:"Mathematics",type:"Logic Puzzle",level:"Beginner",icon:"🔢",description:"Find patterns and work out missing numbers.",mode:"quiz",questions:[["3, 6, 9, 12, __",["13","14","15","18"],"15","Add 3 each time."],["1, 2, 4, 8, __",["10","12","14","16"],"16","Each number doubles."],["20, 18, 16, __",["12","13","14","15"],"14","Subtract 2 each time."],["5, 10, 20, 40, __",["45","50","60","80"],"80","Each number doubles."]]},
+{id:15,title:"ICT Device Match",grade:"Grade 8",subject:"ICT",type:"Quiz",level:"Beginner",icon:"🖥️",description:"Identify computer devices and their purposes.",mode:"quiz",questions:[["Which device displays visual output?",["Keyboard","Monitor","Mouse","Microphone"],"Monitor","A monitor displays text, images and video."],["Which is used to move a pointer on screen?",["Mouse","Printer","Speaker","Scanner"],"Mouse","A mouse controls the pointer."],["Which device produces a paper copy?",["Monitor","Printer","Webcam","Router"],"Printer","A printer produces hard-copy output."]]},
+{id:16,title:"Environmental Guardians",grade:"Grade 6",subject:"Integrated Science",type:"True or False",level:"Beginner",icon:"🌱",description:"Test knowledge of conservation and environmental care.",mode:"quiz",questions:[["Planting trees can help reduce soil erosion.",["True","False"],"True","Roots help hold soil in place."],["Burning all waste outdoors is harmless.",["True","False"],"False","Open burning can release harmful smoke and pollutants."],["Reusing items can reduce waste.",["True","False"],"True","Reuse extends an item's life and can reduce rubbish."],["Clean water is important for health.",["True","False"],"True","Safe water helps prevent waterborne diseases."]]},
+{id:17,title:"Fractions Face-Off",grade:"Grade 7",subject:"Mathematics",type:"Quiz",level:"Intermediate",icon:"½",description:"Compare fractions and practise equivalent fractions.",mode:"quiz",questions:[["Which fraction is equal to 1/2?",["2/3","3/6","4/6","1/3"],"3/6","Multiplying numerator and denominator by 3 gives 3/6."],["Which is larger?",["1/4","1/2","They are equal","Cannot tell"],"1/2","One half is greater than one quarter."],["What is 2/5 of 20?",["4","5","8","10"],"8","20 ÷ 5 × 2 = 8."]]},
+{id:18,title:"Healthy Living Challenge",grade:"Grade 4",subject:"Integrated Science",type:"Quiz",level:"Beginner",icon:"❤️",description:"Learn about hygiene, nutrition and healthy habits.",mode:"quiz",questions:[["Which habit helps prevent the spread of germs?",["Never washing hands","Washing hands with soap","Sharing every towel","Leaving food uncovered"],"Washing hands with soap","Handwashing helps remove germs."],["Which group is a common source of body-building protein?",["Beans","Sweets","Soft drinks","Salt"],"Beans","Beans provide protein."],["Why is sleep important?",["It replaces all food","It supports rest and growth","It stops all illness","It removes the need for exercise"],"It supports rest and growth","Sleep supports learning, health and recovery."]]},
+{id:19,title:"History Timeline",grade:"Grade 8",subject:"Social Studies",type:"Quiz",level:"Intermediate",icon:"⌛",description:"Review timelines, evidence and historical thinking.",mode:"quiz",questions:[["What does a timeline show?",["Events in time order","Only locations","Only weather","A type of map"],"Events in time order","Timelines arrange events chronologically."],["Which can be a primary historical source?",["A diary written at the time","A modern textbook summary","A fictional story written later","A recent quiz"],"A diary written at the time","Primary sources come from the period or people being studied."],["What is archaeology mainly concerned with?",["Studying material remains of past people","Predicting weather","Measuring planets","Writing computer code"],"Studying material remains of past people","Archaeologists study material evidence from the past."]]},
+{id:20,title:"Word Scramble: Science",grade:"Grade 6",subject:"Integrated Science",type:"Word Scramble",level:"Beginner",icon:"🔠",description:"Unscramble science vocabulary using short clues.",mode:"scramble",questions:[["A force that pulls objects towards Earth. Letters: VITYRAG","gravity"],["The planet we live on. Letters: HETRA","earth"],["The gas humans need for respiration. Letters: YXOGEN","oxygen"],["A living thing. Letters: NAGORISM","organism"]]},
+{id:21,title:"Pre-School Shapes",grade:"Pre-School",subject:"Mathematics",type:"Quiz",level:"Beginner",icon:"🔺",description:"Recognise simple shapes and count small numbers.",mode:"quiz",questions:[["Which shape has three sides?",["Circle","Triangle","Square","Rectangle"],"Triangle","A triangle has three sides."],["How many sides does a square have?",["2","3","4","5"],"4","A square has four equal sides."],["What number comes after 4?",["3","5","6","8"],"5","Five comes after four."]]},
+{id:22,title:"Grade 1 Word Match",grade:"Grade 1",subject:"English",type:"Quiz",level:"Beginner",icon:"📚",description:"Practise simple word meanings and early reading.",mode:"quiz",questions:[["Which is an animal?",["Chair","Goat","Cup","Pen"],"Goat","A goat is an animal."],["Which word rhymes with 'cat'?",["Sun","Hat","Dog","Bed"],"Hat","Cat and hat rhyme."],["Choose the correctly spelled word.",["skool","school","scool","shcool"],"school","The correct spelling is school."]]},
+{id:23,title:"Money and Budgeting",grade:"Grade 7",subject:"Mathematics",type:"Math Sprint",level:"Intermediate",icon:"💰",description:"Practise everyday money calculations in Kenyan shillings.",mode:"quiz",questions:[["You have KSh 100 and spend KSh 35. How much remains?",["KSh 55","KSh 65","KSh 75","KSh 85"],"KSh 65","100 − 35 = 65."],["Three notebooks cost KSh 20 each. Total?",["KSh 40","KSh 50","KSh 60","KSh 80"],"KSh 60","3 × 20 = 60."],["An item costs KSh 200 and has a KSh 50 discount. New price?",["KSh 100","KSh 125","KSh 150","KSh 250"],"KSh 150","200 − 50 = 150."]]},
+{id:24,title:"Space Explorer",grade:"Grade 8",subject:"Integrated Science",type:"Quiz",level:"Intermediate",icon:"🪐",description:"Explore planets, stars and the Solar System.",mode:"quiz",questions:[["Which planet is known as the Red Planet?",["Venus","Mars","Jupiter","Mercury"],"Mars","Iron-rich dust gives Mars its reddish appearance."],["What is the star at the centre of our Solar System?",["Sirius","The Sun","Polaris","Earth"],"The Sun","Earth and other planets orbit the Sun."],["Which planet is famous for its prominent rings?",["Saturn","Mercury","Mars","Venus"],"Saturn","Saturn has a large, bright ring system."]]},
+{id:25,title:"Digital Safety",grade:"Grade 9",subject:"ICT",type:"True or False",level:"Intermediate",icon:"🔐",description:"Practise safe, responsible online behaviour.",mode:"quiz",questions:[["You should share your password with strangers online.",["True","False"],"False","Keep passwords private and use trusted account recovery."],["A suspicious link can lead to a scam.",["True","False"],"True","Unexpected links may lead to phishing or harmful websites."],["It is sensible to check information with reliable sources.",["True","False"],"True","Checking sources helps reduce the risk of misinformation."]]},
+{icon:"📝", id:26, title: "Business Communication", grade: "Grade 8", subject: "Pre-Technical", type: "Crossword", level: "Intermediate", description: "Test your Communication Skills.", link: "Pre-tech communication.html" },
+{icon:"📝", id:27, title: "Visual Programming Crossword", grade: "Grade 8", subject: "Pre-Technical", type: "Crossword", level: "Advanced", description: "Visual Programming test it right now.", link: "pre-tech visual-programming.html" },
+{icon:"📝", id:28, title: "Ceramics and Materials Crossword", grade: "Grade 8", subject: "Pre-Technical", type: "Crossword", level: "basic", description: "Ceramics and Composites test it right now.", link: "pre-teckcomposite-ceramics.html" },
+{icon:"🧩", id:29, title: "Jigsaw Puzzle", grade: "Pre-School", subject: "Pre-Technical", type: "Jigsaw Puzzle", level: "basic", description: "Upload your Photo and Try it Now.", link: "jigsaw.html" },
+{icon:"🎮", id:30, title: "3D Shooter", grade: "all grades", subject: "all subjects", type: "Simulation", level: "Advance", description: "Shoot the Boss Down by practicing your math table", link: "3D-shooter.html" },
+{icon:"🔬", id:31, title: "Science Lab", grade: "Grade 8", subject: "Integrated Science", type: "Simulation", level: "Advance", description: "Try out Your Experiments in This virtual lab", link: "laboratory.html" },
+{id:32, title: "Sentence Builder", grade: "Grade 5", subject: "English", type: "Grammar Builder", level: "Beginner", icon: "🧩", description: "Choose the correct word order and punctuation.", mode: "quiz", questions: [["Choose the correctly ordered sentence.", ["The dog brown runs.", "The brown dog runs.", "Runs dog the brown.", "Brown runs the dog."], "The brown dog runs.", "A clear sentence uses a sensible word order."], ["Which punctuation ends a question?", ["Full stop", "Comma", "Question mark", "Apostrophe"], "Question mark", "Questions usually end with a question mark."], ["Choose the correct plural of 'box'.", ["boxs", "boxes", "boxies", "boxen"], "boxes", "Words ending in x commonly take -es in the plural."]] }
+];
+
+
+const gradeFilter = document.querySelector("#grade-filter");
+const subjectFilter = document.querySelector("#subject-filter");
+const typeFilter = document.querySelector("#type-filter");
+const activityList = document.querySelector("#activity-list");
+const resultCount = document.querySelector("#result-count");
+const emptyState = document.querySelector("#empty-state");
+const gameArea = document.querySelector("#game-area");
+
+let current = null, index = 0, score = 0, answered = false;
+let lastHoverTime = 0;
+
+/* ==========================================
+   AUDIO CONTROLLER (SFX & BACKGROUND MUSIC)
+========================================== */
+const soundToggle = document.getElementById("soundToggle");
+const musicToggle = document.getElementById("musicToggle");
+const musicVolume = document.getElementById("musicVolume");
+const bgMusic = document.getElementById("bgMusic");
+
+const sfxClick = document.getElementById("sfxClick");
+const sfxHover = document.getElementById("sfxHover");
+const sfxPlay = document.getElementById("sfxPlay");
+const sfxSwitch = document.getElementById("sfxSwitch");
+
+let soundEnabled = true;
+let musicEnabled = true;
+
+const playAudioFile = function (audioElem) {
+  if (!soundEnabled || !audioElem) return;
+  try {
+    audioElem.currentTime = 0;
+    audioElem.play().catch(function () {});
+  } catch (e) {}
+};
+
+const triggerClickSound = function () { playAudioFile(sfxClick); };
+const triggerHoverSound = function () {
+  const now = Date.now();
+  if (now - lastHoverTime < 150) return;
+  lastHoverTime = now;
+  playAudioFile(sfxHover);
+};
+const triggerPlayButtonSound = function () { playAudioFile(sfxPlay); };
+const triggerSwitchSound = function () { playAudioFile(sfxSwitch); };
+
+const startBackgroundMusic = function () {
+  if (!musicEnabled || !bgMusic) return;
+  bgMusic.play().catch(function () {});
+};
+
+const stopBackgroundMusic = function () {
+  if (bgMusic) bgMusic.pause();
+};
+
+/* ==========================================
+   GAME LOGIC & RENDERING
+========================================== */
+const filtered = function() {
+  return bank.filter(a => 
+    (gradeFilter.value === "all" || a.grade === gradeFilter.value) && 
+    (subjectFilter.value === "all" || a.subject === subjectFilter.value) && 
+    (typeFilter.value === "all" || a.type === typeFilter.value)
+  );
+};
+
+const render = function() {
+  const matches = filtered();
+  activityList.innerHTML = "";
+  matches.forEach(a => {
+    const card = document.createElement("article");
+    card.className = "activity-card";
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="game-icon">${a.icon || '🎮'}</div>
+        <span class="pill">${a.type}</span>
+      </div>
+      <h3>${a.title}</h3>
+      <p>${a.description}</p>
+      <div class="meta">${a.grade} · ${a.subject} · ${a.level}</div>
+      <button class="play-link" data-play="${a.id}">Play activity →</button>
+    `;
+
+    card.addEventListener("mouseenter", triggerHoverSound);
+    const playBtn = card.querySelector(".play-link");
+    playBtn.addEventListener("mouseenter", triggerHoverSound);
+    playBtn.addEventListener("click", function() {
+      triggerPlayButtonSound();
+      if (a.link) {
+        window.location.href = a.link;
+      } else {
+        start(a.id);
+      }
+    });
+
+    activityList.appendChild(card);
+  });
+  resultCount.textContent = `${matches.length} ${matches.length === 1 ? "activity" : "activities"}`;
+  emptyState.hidden = matches.length !== 0;
+};
+
+const start = function(id) {
+  current = bank.find(a => a.id === id);
+  index = 0;
+  score = 0;
+  answered = false;
+  gameArea.hidden = false;
+  document.querySelector("#filters-panel").hidden = true;
+  document.querySelector("#results-section").hidden = true;
+  showQuestion();
+  gameArea.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+const back = function() {
+  triggerClickSound();
+  gameArea.hidden = true;
+  document.querySelector("#filters-panel").hidden = false;
+  document.querySelector("#results-section").hidden = false;
+  current = null;
+};
+
+const showQuestion = function() {
+  if(!current) return;
+  if(index >= current.questions.length) {
+    gameArea.innerHTML = `
+      <div class="game-top">
+        <div><p class="eyebrow">ACTIVITY COMPLETE</p><h2>${current.title}</h2></div>
+        <span class="score">Score: ${score}/${current.questions.length}</span>
+      </div>
+      <p class="game-question">${score === current.questions.length ? "Excellent! Perfect score." : score >= current.questions.length/2 ? "Good work. Review the explanations and try again." : "Keep practising. Read the feedback and try again."}</p>
+      <div class="progress"><div style="width:100%"></div></div>
+      <div class="game-controls">
+        <button class="primary" id="replay">Play again</button>
+        <button id="back-list">Back to activities</button>
+      </div>
+    `;
+    document.querySelector("#replay").onclick = () => { triggerClickSound(); start(current.id); };
+    document.querySelector("#back-list").onclick = back;
+    return;
+  }
+  answered = false;
+  const q = current.questions[index];
+  let body = "";
+  if(current.mode === "quiz") {
+    body = `<div class="answers">${q[1].map((x,i)=>`<button class="answer" data-answer="${i}">${escapeHTML(x)}</button>`).join("")}</div>`;
+  } else if(current.mode === "input") {
+    body = `<label>Type your answer<input class="word-input" id="typed-answer" autocomplete="off" placeholder="Enter your answer"></label><div class="game-controls"><button class="primary" id="check-input">Check answer</button></div>`;
+  } else if(current.mode === "scramble") {
+    const letters = (q[1]||"").toUpperCase().split("").sort(()=>Math.random()-.5).join(" ");
+    body = `<p class="small-note">Unscramble these letters: <strong>${letters}</strong></p><label>Your answer<input class="word-input" id="typed-answer" autocomplete="off" placeholder="Type the word"></label><div class="game-controls"><button class="primary" id="check-input">Check answer</button></div>`;
+  } else if(current.mode === "flash") {
+    body = `<div class="panel" style="background:var(--panel2)"><p class="eyebrow">FLASHCARD</p><h2>${escapeHTML(q[0])}</h2><p id="flash-answer" hidden>${escapeHTML(q[1])}</p><button id="reveal">Reveal definition</button></div><div class="game-controls"><button class="primary" id="flash-known">I knew it ✓</button><button id="flash-review">Practise this again</button></div>`;
+  }
+  
+  gameArea.innerHTML = `
+    <div class="game-top">
+      <div><p class="eyebrow">${current.type.toUpperCase()} · QUESTION ${index+1} OF ${current.questions.length}</p><h2>${current.title}</h2></div>
+      <button id="exit-game">← Activities</button>
+      <span class="score">Score: ${score}</span>
+    </div>
+    <div class="progress"><div style="width:${index/current.questions.length*100}%"></div></div>
+    <p class="game-question">${escapeHTML(q[0])}</p>${body}
+    <p id="feedback" class="feedback" role="status"></p>
+    <div class="game-controls" id="next-controls" hidden><button class="primary" id="next-question">${index===current.questions.length-1?"See results":"Next question →"}</button></div>
+  `;
+  
+  document.querySelector("#exit-game").onclick = back;
+  if(current.mode === "quiz") {
+    document.querySelectorAll("[data-answer]").forEach(b => b.onclick = () => { triggerClickSound(); answerQuiz(Number(b.dataset.answer)); });
+  }
+  if(current.mode === "input" || current.mode === "scramble") {
+    document.querySelector("#check-input").onclick = () => { triggerClickSound(); checkInput(); };
+    document.querySelector("#typed-answer").addEventListener("keydown", e => { if(e.key === "Enter") { triggerClickSound(); checkInput(); } });
+  }
+  if(current.mode === "flash") {
+    document.querySelector("#reveal").onclick = () => { triggerClickSound(); document.querySelector("#flash-answer").hidden = false; };
+    document.querySelector("#flash-known").onclick = () => { triggerClickSound(); score++; next(); };
+    document.querySelector("#flash-review").onclick = () => { triggerClickSound(); next(); };
+  }
+  document.querySelector("#next-question").onclick = () => { triggerClickSound(); index++; showQuestion(); };
+};
+
+const answerQuiz = function(n) {
+  if(answered) return;
+  answered = true;
+  const q = current.questions[index], selected = q[1][n], correct = selected === q[2];
+  if(correct) score++;
+  document.querySelectorAll("[data-answer]").forEach((b,i) => {
+    b.disabled = true;
+    if(q[1][i] === q[2]) b.classList.add("correct");
+    else if(i === n) b.classList.add("wrong");
+  });
+  feedback((correct ? "Correct! " : "Not quite. Correct answer: " + q[2] + ". ") + (q[3]||""), correct);
+  showNext();
+};
+
+const checkInput = function() {
+  if(answered) return;
+  const q = current.questions[index], v = document.querySelector("#typed-answer").value.trim().toLowerCase(), target = q[1].toLowerCase();
+  if(!v) { document.querySelector("#feedback").textContent = "Type an answer first."; return; }
+  answered = true;
+  const correct = v === target;
+  if(correct) score++;
+  document.querySelector("#typed-answer").disabled = true;
+  feedback((correct ? "Correct! " : "Correct answer: " + q[1] + ". ") + (q[2]||"Well done."), correct);
+  showNext();
+};
+
+const feedback = function(s, good) {
+  const f = document.querySelector("#feedback");
+  f.textContent = s;
+  f.style.color = good ? "var(--good)" : "var(--bad)";
+};
+
+const showNext = function() {
+  document.querySelector("#next-controls").hidden = false;
+  document.querySelector(".score").textContent = "Score: " + score;
+};
+
+const next = function() {
+  index++;
+  showQuestion();
+};
+
+const escapeHTML = function(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+};
+
+/* ==========================================
+   EVENT LISTENERS & UI BINDINGS
+========================================== */
+[gradeFilter, subjectFilter, typeFilter].forEach(x => x.addEventListener("change", () => {
+  triggerSwitchSound();
+  render();
+}));
+
+document.querySelector("#reset-button").onclick = () => {
+  triggerClickSound();
+  gradeFilter.value = subjectFilter.value = typeFilter.value = "all";
+  render();
+};
+
+document.querySelector("#home-link").onclick = e => {
+  e.preventDefault();
+  triggerClickSound();
+  back();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+if(soundToggle) {
+  soundToggle.addEventListener("click", () => {
+    soundEnabled = !soundEnabled;
+    soundToggle.querySelector(".hud-text").textContent = soundEnabled ? "SFX On" : "SFX Off";
+    soundToggle.querySelector(".hud-icon").textContent = soundEnabled ? "🔊" : "🔇";
+    soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+    if(soundEnabled) triggerClickSound();
+  });
+}
+
+if(bgMusic && musicVolume) {
+  bgMusic.volume = Number(musicVolume.value) / 100;
+}
+
+if(musicToggle) {
+  musicToggle.addEventListener("click", () => {
+    musicEnabled = !musicEnabled;
+    if(musicEnabled) {
+      musicToggle.querySelector(".hud-text").textContent = "Music On";
+      musicToggle.setAttribute("aria-pressed", "true");
+      startBackgroundMusic();
+    } else {
+      musicToggle.querySelector(".hud-text").textContent = "Music Off";
+      musicToggle.setAttribute("aria-pressed", "false");
+      stopBackgroundMusic();
+    }
+  });
+}
+
+if(musicVolume) {
+  musicVolume.addEventListener("input", () => {
+    if(bgMusic) bgMusic.volume = Number(musicVolume.value) / 100;
+  });
+}
+
+document.addEventListener("pointerdown", (event) => {
+  if(event.target.closest && event.target.closest("#musicToggle")) return;
+  startBackgroundMusic();
+}, { once: true });
+
+render();
+
+</script></body></html>
