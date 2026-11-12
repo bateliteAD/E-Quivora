@@ -1,0 +1,217 @@
+/* General Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    scroll-behavior: smooth;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Navbar */
+.servicebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    background-color: #7f9abe;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.imglogo h2 {
+    color: white;
+    font-size: 1.5rem;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li {
+    margin-left: 30px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+}
+
+.navbutton2 {
+    border: none;
+    padding: 8px 20px;
+    background-color: white;
+    border-radius: 20px;
+    color: #7f9abe;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.navbutton2:hover {
+    background-color: #e0e0e0;
+}
+
+/* Hero Section with Kids Background */
+.hero-section {
+    height: 80vh;
+    background-image: url('https://www.globalgiving.org/pfil/20521/pict_original.jpg'); /* High-quality image of kids learning */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-overlay {
+    background: rgba(0, 0, 0, 0.4); /* Darkens the image so text is readable */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 5%;
+}
+
+.header_content {
+    color: white;
+    max-width: 600px;
+}
+
+.header_content h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+/* Content Sections */
+.content-section {
+    padding: 80px 10%;
+    text-align: center;
+}
+
+.mission-bg {
+    background-color: #7f9abe;
+    color: white;
+}
+
+/* Horizontal Scroll Services */
+.services-container {
+    padding: 60px 0;
+    background: #fff;
+    text-align: center;
+}
+
+.services-container h2 {
+    margin-bottom: 30px;
+}
+
+.horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    padding: 20px;
+    gap: 20px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin; /* For Firefox */
+}
+
+/* Hide scrollbar for Chrome/Safari but keep functionality */
+.horizontal-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+.horizontal-scroll::-webkit-scrollbar-thumb {
+    background: #7f9abe;
+    border-radius: 10px;
+}
+
+.service-card {
+    min-width: 300px;
+    background: #f9f9f9;
+    padding: 40px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    scroll-snap-align: center;
+    transition: transform 0.3s;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+}
+
+.service-card h3 {
+    color: #7f9abe;
+    margin-bottom: 15px;
+}
+/* --- Mobile Responsive Styles --- */
+
+@media screen and (max-width: 768px) {
+    /* 1. Stack the Navbar */
+    .servicebar {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    nav ul {
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    nav ul li {
+        margin: 5px 10px;
+    }
+
+    /* 2. Adjust the Hero Section */
+    .hero-section {
+        height: 60vh; /* Shorter on mobile */
+        background-position: center;
+    }
+
+    .header_content {
+        padding: 0 20px;
+        text-align: center;
+    }
+
+    .header_content h1 {
+        font-size: 1.8rem; /* Smaller text for small screens */
+    }
+
+    .nav_p {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .nav_header {
+        width: 100%;
+        padding-top: 20px;
+    }
+
+    /* 3. Adjust Content Sections */
+    .content-section {
+        padding: 40px 5%;
+    }
+
+    /* 4. Improve Horizontal Scroll Visibility */
+    .service-card {
+        min-width: 80%; /* Show most of the card so user knows to scroll */
+        margin-right: 10px;
+    }
+}
+
+/* Extra small devices (Phones) */
+@media screen and (max-width: 480px) {
+    .header_content h1 {
+        font-size: 1.5rem;
+    }
+    
+    .navbutton2 {
+        width: 100%; /* Make button full width on tiny screens */
+        margin-top: 10px;
+    }
+}

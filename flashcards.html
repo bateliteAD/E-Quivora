@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masomo Broo | English Vocabulary Flashcards</title>
+<link rel="stylesheet" href="crosswords_2.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="sample.html"><span class="brand-mark">MB</span> Masomo <b>Broo</b></a>
+  <a class="back-link" href="sample.html">← Back to activities</a>
+</header>
+<main class="page">
+<section class="game-heading">
+  <div>
+    <p class="eyebrow">GRADE 4 · ENGLISH</p>
+    <h1>English Vocabulary Flashcards</h1>
+    <p class="intro">Flip cards to master challenging new vocabulary words[cite: 7].</p>
+  </div>
+  <div class="progress-card">
+    <div class="progress-line"><span id="progress-label">Card Progress</span><strong id="progress-percent">1 / 4</strong></div>
+    <div class="progress-track"><div id="progress-fill" style="width: 25%;"></div></div>
+    <p id="status-message" aria-live="polite">Click card to flip.</p>
+  </div>
+</section>
+
+<section class="game-layout">
+  <div class="board-panel" style="grid-column: span 2; text-align: center; padding: 40px 20px;">
+    <div id="flashcard" style="background: var(--panel); border: 2px solid var(--amber); border-radius: 18px; min-height: 220px; display: grid; place-items: center; padding: 30px; cursor: pointer; transition: transform 0.3s;">
+      <div>
+        <span class="mini-label" id="card-type">TERM</span>
+        <h2 id="card-content" style="font-size: 2rem; margin-top: 15px;">Hypothesis</h2>
+        <p style="color: var(--muted); margin-top: 15px; font-size: 12px;">(Click anywhere on card to reveal definition)</p>
+      </div>
+    </div>
+    <div class="actions" style="justify-content: center; margin-top: 25px;">
+      <button id="prev-card" class="btn btn-secondary">← Previous</button>
+      <button id="next-card" class="btn btn-primary">Next Card →</button>
+    </div>
+  </div>
+</section>
+<footer><span>Learn a little. Solve a lot.</span><span>© Masomo Broo</span></footer>
+</main>
+<script>
+const cards = [
+  { term: "Hypothesis", definition: "A proposed explanation made on the basis of limited evidence as a starting point for further investigation." },
+  { term: "Synonym", definition: "A word or phrase that means exactly or nearly the same as another word or phrase." },
+  { term: "Ecosystem", definition: "A biological community of interacting organisms and their physical environment." },
+  { term: "Alliteration", definition: "The occurrence of the same letter or sound at the beginning of adjacent or closely connected words." }
+];
+
+let currentIndex = 0;
+let showingDefinition = false;
+
+const flashcard = document.getElementById("flashcard");
+const cardType = document.getElementById("card-type");
+const cardContent = document.getElementById("card-content");
+
+function updateCard() {
+  showingDefinition = false;
+  cardType.textContent = "TERM";
+  cardContent.textContent = cards[currentIndex].term;
+  document.getElementById("progress-percent").textContent = `${currentIndex + 1} / ${cards.length}`;
+  document.getElementById("progress-fill").style.width = `${((currentIndex + 1) / cards.length) * 100}%`;
+}
+
+flashcard.addEventListener("click", () => {
+  showingDefinition = !showingDefinition;
+  if(showingDefinition) {
+    cardType.textContent = "DEFINITION";
+    cardContent.textContent = cards[currentIndex].definition;
+  } else {
+    cardType.textContent = "TERM";
+    cardContent.textContent = cards[currentIndex].term;
+  }
+});
+
+document.getElementById("next-card").addEventListener("click", (e) => {
+  e.stopPropagation();
+  currentIndex = (currentIndex + 1) % cards.length;
+  updateCard();
+});
+
+document.getElementById("prev-card").addEventListener("click", (e) => {
+  e.stopPropagation();
+  currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+  updateCard();
+});
+
+updateCard();
+</script>
+</body>
+</html>
